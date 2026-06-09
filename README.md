@@ -72,6 +72,12 @@ Or connect it to your LLM client (e.g., Claude Desktop, or your other project) b
 node /absolute/path/to/dist/index.js
 ```
 
+### 6. Storage & Quota Considerations
+
+When the MCP server automatically generates Google Docs, it behaves as follows:
+- **Ownership & Storage:** The created documents are saved in the Google Drive of the **admin account** (the account used to generate the `.env` credentials). This means they consume the storage quota of the admin account. However, text-based Google Docs are incredibly lightweight; thousands of reports will only consume a few megabytes.
+- **Recipient Storage:** When the server shares the document with the respective product or engineering teams, it grants them "Reader" access. The document will appear in their "Shared with me" folder. **It does not consume any of their personal Google Drive storage limit.**
+
 ## Advanced Features
 
 ### Teams Distribution

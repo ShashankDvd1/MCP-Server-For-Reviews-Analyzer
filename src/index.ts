@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { createEmail } from "./services/gmailService";
 import { createGoogleDoc, shareGoogleDoc } from "./services/docsService";
-import { getTeamEmails } from "./db/database";
+import { getTeamEmails, getAllTeams } from "./db/database";
 
 const server = new McpServer({
   name: "distribution-mcp-server",
@@ -106,6 +106,11 @@ server.tool(
       if (team_name) {
         const teamEmails = getTeamEmails(team_name);
         allEmails = allEmails.concat(teamEmails);
+      } else {
+        const teams = getAllTeams();
+        for (const t of teams) {
+          allEmails = allEmails.concat(getTeamEmails(t));
+        }
       }
       
       // Deduplicate emails

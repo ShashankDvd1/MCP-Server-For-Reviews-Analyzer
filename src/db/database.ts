@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 
 // Ensure data directory exists
-const dataDir = path.join(process.cwd(), 'data');
+const dataDir = path.join(__dirname, '../../data');
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
@@ -68,7 +68,7 @@ export function getTeamEmails(teamName: string): string[] {
     SELECT members.email 
     FROM members 
     JOIN teams ON teams.id = members.team_id 
-    WHERE teams.name = ?
+    WHERE teams.name LIKE '%' || ? || '%'
   `);
   const rows = stmt.all(teamName) as { email: string }[];
   return rows.map(r => r.email);
