@@ -16,3 +16,5 @@ export const getGoogleAuth = () => oauth2Client;
 export const docs = google.docs({ version: 'v1', auth: oauth2Client });
 export const drive = google.drive({ version: 'v3', auth: oauth2Client });
 export const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+export const forms = google.forms({ version: 'v1', auth: oauth2Client });
+export const slides = google.slides({ version: 'v1', auth: oauth2Client });

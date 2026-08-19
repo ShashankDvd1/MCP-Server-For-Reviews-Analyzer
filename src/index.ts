@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { createEmail } from "./services/gmailService";
 import { createGoogleDoc, shareGoogleDoc } from "./services/docsService";
+import { createGoogleForm } from "./services/formsService";
 import { getTeamEmails, getAllTeams } from "./db/database";
 
 const server = new McpServer({
@@ -59,6 +60,33 @@ server.tool(
     } catch (error: any) {
       return {
         content: [{ type: "text", text: `Failed to create document: ${error.message}` }],
+        isError: true,
+      };
+    }
+  }
+);
+
+// Tool: create_google_form
+server.tool(
+  "create_google_form",
+  "Creates a Google Form from a structured survey payload",
+  {
+    title: z.string().describe("Title of the Google Form"),
+    description: z.string().optional().describe("Description for the form"),
+    surveyData: z.any().describe("The JSON structure of the survey including sections and questions"),
+  },
+  async ({ title, description, surveyData }) => {
+    try {
+      const result = await createGoogleForm(title, description || "", surveyData);
+      return {
+        content: [{ 
+          type: "text", 
+          text: `Form created successfully.\nID: ${result.formId}\nEdit URL: ${result.formUrl}\nLive URL: ${result.responderUri}` 
+        }],
+      };
+    } catch (error: any) {
+      return {
+        content: [{ type: "text", text: `Failed to create form: ${error.message}` }],
         isError: true,
       };
     }
@@ -148,6 +176,46 @@ server.tool(
     } catch (error: any) {
       return {
         content: [{ type: "text", text: `Failed to send report: ${error.message}` }],
+        isError: true,
+      };
+    }
+  }
+);
+
+import { createGooglePresentation } from "./services/slidesService";
+
+// Tool: create_google_presentation
+server.tool(
+  "create_google_presentation",
+  "Creates a Google Slides presentation with a set of slides using Title and Body layouts",
+  {
+    title: z.string().describe("Title of the presentation"),
+    slides_data: z.array(
+      z.object({
+        title: z.string().describe("Title of the slide"),
+        content: z.string().describe("Content (bullet points or text) for the slide body")
+      })
+    ).optional().describe("Array of slides to generate in the presentation (for legacy blank deck creation)"),
+    templatePresentationId: z.string().optional().describe("ID of the Google Slides template to duplicate"),
+    replacements: z.array(
+      z.object({
+        matchText: z.string().describe("Placeholder text to find (e.g. {{Title}})"),
+        replaceText: z.string().describe("Replacement text to insert")
+      })
+    ).optional().describe("Dynamic text replacements for placeholders in the template")
+  },
+  async ({ title, slides_data, templatePresentationId, replacements }) => {
+    try {
+      const result = await createGooglePresentation(title, slides_data || [], templatePresentationId, replacements);
+      return {
+        content: [{ 
+          type: "text", 
+          text: `Presentation created successfully.\nID: ${result.presentationId}\nEdit URL: ${result.presentationUrl}` 
+        }],
+      };
+    } catch (error: any) {
+      return {
+        content: [{ type: "text", text: `Failed to create presentation: ${error.message}` }],
         isError: true,
       };
     }
